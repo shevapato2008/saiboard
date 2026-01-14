@@ -32,7 +32,7 @@ static const char *TAG = "TCP/IP socket server";
 static adc_oneshot_unit_handle_t adc1_handle;
 static led_strip_t strip = {
     .type = LED_STRIP_SK6812,
-    .length = 361,
+    .length = 64, // CHANGED: 8x8 = 64
     .gpio = LED_PIN_AT_5,
     .buf = NULL,
     .is_rgbw = true,
@@ -40,9 +40,11 @@ static led_strip_t strip = {
 
 void _sensor_endpoint(cJSON *answer)
 {
-    ESP_LOGI(TAG, "Sensors");
+    ESP_LOGI(TAG, "Sensors (8x8 Mode)");
     cJSON *hall = cJSON_AddArrayToObject(answer, "hall");
-    static uint8_t demux[19][4] = {
+    
+    // CHANGED: Reduced demux for 8 rows
+    static uint8_t demux[8][4] = {
         {0, 0, 0, 1}, // 0
         {1, 0, 0, 1}, // 1
         {0, 1, 0, 1}, // 2
@@ -50,23 +52,14 @@ void _sensor_endpoint(cJSON *answer)
         {1, 0, 0, 0}, // 4
         {0, 1, 0, 0}, // 5
         {1, 1, 0, 0}, // 6
-        {0, 0, 1, 0}, // 7
-        {1, 0, 1, 0}, // 8
-        {0, 1, 1, 0}, // 9
-        {1, 1, 1, 0}, // 10
-        {1, 1, 1, 0}, // 11
-        {0, 1, 1, 0}, // 12
-        {1, 0, 1, 0}, // 13
-        {0, 0, 1, 0}, // 14
-        {1, 1, 0, 0}, // 15
-        {0, 1, 0, 0}, // 16
-        {1, 0, 0, 0}, // 17
-        {0, 0, 0, 0}  // 18
+        {0, 0, 1, 0}  // 7
     };
-    for (int8_t r = 18; r >= 0; r--)
+
+    // CHANGED: Loop 0-7 for 8x8 matrix
+    for (int8_t r = 7; r >= 0; r--)
     {
         cJSON *row = cJSON_CreateArray();
-        gpio_set_level(E_AT_6, (r > 10) ? 1 : 0);
+        gpio_set_level(E_AT_6, 0); // Always enabled for small test
         gpio_set_level(A0_AT_12, demux[r][0]);
         gpio_set_level(A1_AT_11, demux[r][1]);
         gpio_set_level(A2_AT_10, demux[r][2]);
@@ -74,37 +67,21 @@ void _sensor_endpoint(cJSON *answer)
         gpio_set_level(S0_AT_3, 0);
         gpio_set_level(S1_AT_2, 0);
         vTaskDelay(1 / portTICK_PERIOD_MS);
-        int raw[19];
-        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN0, &raw[8]));
-        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN1, &raw[9]));
-        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN2, &raw[10]));
-        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN3, &raw[0]));
-        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN4, &raw[1]));
-        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN5, &raw[11]));
-        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN6, &raw[12]));
-        gpio_set_level(S0_AT_3, 1);
-        gpio_set_level(S1_AT_2, 0);
-        vTaskDelay(1 / portTICK_PERIOD_MS);
-        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN3, &raw[2]));
-        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN4, &raw[3]));
-        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN5, &raw[13]));
-        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN6, &raw[14]));
-        gpio_set_level(S0_AT_3, 0);
-        gpio_set_level(S1_AT_2, 1);
-        vTaskDelay(1 / portTICK_PERIOD_MS);
-        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN3, &raw[4]));
-        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN4, &raw[5]));
-        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN5, &raw[15]));
-        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN6, &raw[16]));
-        gpio_set_level(S0_AT_3, 1);
-        gpio_set_level(S1_AT_2, 1);
-        vTaskDelay(1 / portTICK_PERIOD_MS);
-        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN3, &raw[6]));
-        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN4, &raw[7]));
-        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN5, &raw[17]));
-        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN6, &raw[18]));
+        
+        // FAKE READ for 8x8 test compatibility if no sensors attached
+        // Or keep reading ADC if you actually wired 8 sensors to these channels
+        int raw[8]; 
+        // Just reading some channels to simulate activity or actual reading
+        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN0, &raw[0]));
+        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN1, &raw[1]));
+        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN2, &raw[2]));
+        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN3, &raw[3]));
+        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN4, &raw[4]));
+        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN5, &raw[5]));
+        ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN6, &raw[6]));
+        raw[7] = 0; // Padding
 
-        for (uint8_t c = 0; c < 19; c++)
+        for (uint8_t c = 0; c < 8; c++)
         {
             cJSON *c_raw = cJSON_CreateNumber(raw[c]);
             cJSON_AddItemToArray(row, c_raw);
@@ -118,20 +95,11 @@ void _sensor_endpoint(cJSON *answer)
 
 int _row_col_to_nr(int row, int col)
 {
-    int nr;
-    if (col < 8)
-    {
-        nr = row * 8 + (7 - col) * (row % 2) + col * !(row % 2);
-    }
-    else if (col > 10)
-    {
-        nr = row * 8 + 208 + (19 - col) * (row % 2) + (col - 10) * !(row % 2);
-    }
-    else
-    {
-        nr = 151 + (18 - row) * 3 + (11 - col) * (row % 2) + (col - 7) * !(row % 2);
-    }
-    return nr;
+    // CHANGED: Simple linear mapping for 8x8 matrix
+    // Assuming standard zigzag or linear layout. 
+    // If your matrix is zigzag, you might need:
+    // if (row % 2 == 1) return row * 8 + (7 - col);
+    return row * 8 + col;
 }
 
 void _led_endpoint(cJSON *answer, const cJSON *leds)
@@ -149,8 +117,11 @@ void _led_endpoint(cJSON *answer, const cJSON *leds)
 
         if (cJSON_IsNumber(red) && cJSON_IsNumber(green) && cJSON_IsNumber(blue) && cJSON_IsNumber(white))
         {
-            ESP_LOGI(TAG, "pos: (%d,%d) r: %d g: %d b: %d, w: %d", row->valueint, col->valueint, red->valueint, green->valueint, blue->valueint, white->valueint);
-            led_strip_set_pixel(&strip, _row_col_to_nr(row->valueint, col->valueint), red->valueint, green->valueint, blue->valueint, white->valueint);
+            // Filter out-of-bounds for 8x8
+            if (row->valueint < 8 && col->valueint < 8) {
+                ESP_LOGI(TAG, "pos: (%d,%d) r: %d g: %d b: %d, w: %d", row->valueint, col->valueint, red->valueint, green->valueint, blue->valueint, white->valueint);
+                led_strip_set_pixel(&strip, _row_col_to_nr(row->valueint, col->valueint), red->valueint, green->valueint, blue->valueint, white->valueint);
+            }
         }
     }
     ESP_ERROR_CHECK(led_strip_flush(&strip));

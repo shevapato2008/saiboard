@@ -194,3 +194,6 @@ fp-info-cache
 
 .vscode/
 sdkconfig*
+
+# Gemini
+.gemini-clipboard
