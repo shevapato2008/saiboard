@@ -10,6 +10,14 @@
   - `software/flutter/saiboard/` Flutter web UI.
 - `pics/` stores images used in docs and UI previews.
 
+## CAD/CAM File Types (`board/`, `stones/`)
+
+| Extension | What it is used for | Software to open/view |
+| --- | --- | --- |
+| `.dxf` | CAD interchange (2D outlines/holes; sometimes simple 3D). Common for laser/waterjet/CNC profiles. | AutoCAD, Fusion 360, FreeCAD, DraftSight, QCAD; import via LightBurn / Inkscape |
+| `.f3d` | Fusion 360 native design (parametric models, sketches, assemblies, CAM). | Autodesk Fusion 360 |
+| `.gcode` / `.nc` | CNC toolpath instructions (machine/executor commands). | Any text editor; CNCjs, OpenBuilds CONTROL, UGS; CAMotics for simulation/preview |
+
 ## Build, Test, and Development Commands
 - Backend stack:
   - `cd software/backend`
