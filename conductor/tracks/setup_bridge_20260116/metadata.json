@@ -1,0 +1,8 @@
+{
+  "track_id": "setup_bridge_20260116",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-01-16T10:00:00Z",
+  "updated_at": "2026-01-16T10:00:00Z",
+  "description": "Establish the macOS development environment and verify the end-to-end communication between hardware and software."
+}
