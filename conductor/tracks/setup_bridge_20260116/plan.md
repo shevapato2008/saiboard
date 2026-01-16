@@ -1,11 +1,11 @@
 # Implementation Plan: setup_bridge_20260116
 
 ## Phase 1: Environment Readiness
-- [ ] Task: Install and configure ESP-IDF on macOS
-    - [ ] Verify `idf.py --version`
-- [ ] Task: Set up Docker and Docker Compose
-    - [ ] Verify `docker compose version`
-- [ ] Task: Configure Python Virtual Environment for local scripts
+- [x] Task: Install and configure ESP-IDF on macOS
+    - [x] Verify `idf.py --version`
+- [x] Task: Set up Docker and Docker Compose
+    - [x] Verify `docker compose version`
+- [x] Task: Configure Python Virtual Environment for local scripts (using conda environment `py311_esp32s3`)
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Environment Readiness' (Protocol in workflow.md)
 
 ## Phase 2: Firmware & Communication
