@@ -42,7 +42,7 @@ services:
   katago:
     build:
       context: ./katago
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile_rasp
     links:
       - redis
     depends_on:
