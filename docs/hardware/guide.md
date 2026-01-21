@@ -49,6 +49,48 @@
 ## 3. 分步指导计划
 
 ### 第一步：查看模型 (2.1)
+
+#### 详细文件清单 (Module File List)
+
+以下是各模块的核心设计文件及其查看/编辑所需的软件：
+
+**A. 棋盘结构 (Board Structure)**
+主要涉及木工 CNC 加工和激光切割文件。
+
+| 文件路径 | 文件名 | 说明 | 推荐软件 |
+| :--- | :--- | :--- | :--- |
+| `board/cnc_files/` | `Top.f3d` | 棋盘顶层面板的 3D 源文件，包含开孔和槽位设计。 | **Fusion 360** |
+| | `top.dxf` | 用于激光切割或 CNC 的 2D 矢量图（顶层）。 | **AutoCAD** / **Inkscape** |
+| | `grid.f3d` | 棋盘网格层的 3D 源文件（用于透光显示网格）。 | **Fusion 360** |
+| | `grid.dxf` | 网格层的 2D 切割图。 | **AutoCAD** / **Inkscape** |
+| | `bottom.f3d` | 棋盘底层背板的 3D 源文件。 | **Fusion 360** |
+| | `bottom.dxf` | 底层背板的 2D 切割图。 | **AutoCAD** / **Inkscape** |
+| | `side.f3d` / `side.dxf` | 棋盘侧边框的 3D 模型与 2D 切割图。 | **Fusion 360** / **AutoCAD** |
+| `board/3d_prints/` | `pen_part1.f3d`, `pen_part2.f3d` | 辅助工具或装饰件的 3D 模型。 | **Fusion 360** |
+
+**B. 电子系统 (Electronics)**
+涉及 PCB 电路设计和电子元件的 3D 打印支架。
+
+| 文件路径 | 文件名 | 说明 | 推荐软件 |
+| :--- | :--- | :--- | :--- |
+| `electronics/kicad_files/8x8/` | `8x8.kicad_pro` | 8x8 传感器阵列主板的项目文件。 | **KiCad** |
+| | `8x8.kicad_pcb` | 8x8 主板的 PCB 布局文件。 | **KiCad** (PCB Editor) |
+| | `8x8.kicad_sch` | 8x8 主板的电路原理图。 | **KiCad** (Schematic Editor) |
+| `electronics/kicad_files/[11x3, 3x8, 8x3]/` | `*.kicad_pcb` | 边缘补丁板的 PCB 文件，用于拼接完整棋盘。 | **KiCad** |
+| `electronics/3d_prints/` | `*_pcb_mask.f3d` | PCB 遮光罩与固定件的 3D 模型（如 `8x8_pcb_mask.f3d`）。 | **Fusion 360** |
+| | `raspberry_pi_mount.f3d` | 树莓派固定支架的 3D 模型。 | **Fusion 360** |
+| | `*.gcode` | 预先切片好的打印文件（针对特定打印机）。 | 直接导入 3D 打印机 (如 Prusa) |
+
+**C. 棋子与模具 (Stones & Molds)**
+涉及棋子翻模制作所需的 3D 打印模具。
+
+| 文件路径 | 文件名 | 说明 | 推荐软件 |
+| :--- | :--- | :--- | :--- |
+| `stones/3d_prints/` | `go_stones_mold.f3d` | 棋子模具的 3D 源文件。 | **Fusion 360** |
+| | `stone_holder.f3d` | 棋子收纳架或固定器的 3D 模型。 | **Fusion 360** |
+| | `*.gcode` | 模具与收纳架的打印切片文件。 | 直接导入 3D 打印机 |
+
+#### 操作演示
 1.  **3D 模型**: 打开 Fusion 360，使用 `File -> Open` 打开 `board/cnc_files/top.f3d`。
     *   *操作技巧*: 按住鼠标中键平移，`Shift + 鼠标中键` 旋转，滚轮缩放。
 2.  **电路板**: 打开 KiCad，进入 `PCB Editor` 载入 `electronics/kicad_files/8x8/8x8.kicad_pcb`。
@@ -61,12 +103,19 @@
 ### 第三步：联系厂商生产 (2.3)
 当你准备好文件后，如何跟加工厂沟通？
 
-#### A. PCB 生产 (找嘉立创等厂商)
-*   **术语**: “我要打样 PCB，已经准备好了 **Gerber 文件**。”
-*   **核心参数**: 
-    *   **层数 (Layers)**: 通常是 2层或 4层。
-    *   **板厚 (Thickness)**: 常规为 1.6mm。
-    *   **阻焊颜色 (Solder Mask)**: 绿色、黑色或白色。
+#### A. PCB 生产与 SMT 贴片 (找嘉立创等厂商)
+*   **推荐导出流程 (KiCad 一键导出)**:
+    1.  **安装插件**: 在 KiCad 主界面的 `Plugin and Content Manager` 中安装 **Fabrication Toolkit**。
+    2.  **一键生成**: 打开 `.kicad_pcb` 文件，点击工具栏插件图标 -> `Generate`。
+    3.  **获取文件**: 插件会在项目下生成 `production/` 文件夹，包含：
+        *   `*.zip`: **Gerber 文件**（裸板生产用）。
+        *   `bom.csv`: **物料清单**（SMT 贴片用）。
+        *   `positions.csv`: **坐标文件**（SMT 贴片用，即 CPL/POS）。
+*   **核心生产参数**: 
+    *   **层数 (Layers)**: 2层。
+    *   **板厚 (Thickness)**: 1.6mm。
+    *   **阻焊颜色 (Solder Mask)**: 强烈建议选**白色**（漫反射 LED 灯光，视觉效果更均匀）。
+    *   **表面工艺**: 有铅/无铅喷锡或沉金均可。
 
 #### B. 3D 打印 (找网上的打印服务)
 *   **术语**: “我要打印这个零件，格式是 **STL** 或 **STEP**，材料用 **PETG** 或 **PLA**。”
@@ -79,3 +128,4 @@
 *   **核心参数**: 
     *   **切割 vs 雕刻**: 告诉师傅哪些线条是“切断”，哪些是“浅层雕刻”（如棋盘的网格线）。
     *   **比例单位**: 务必强调“单位是 **毫米 (mm)**”，防止厂商导入时比例缩放错误。
+
