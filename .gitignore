@@ -192,6 +192,9 @@ fp-info-cache
 *.xml
 *.csv
 
+# Compressed files
+*.zip
+
 .vscode/
 sdkconfig*
 
