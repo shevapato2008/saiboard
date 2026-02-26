@@ -88,7 +88,7 @@ plot_opts = plot_ctrl.GetPlotOptions()
 
 plot_opts.SetOutputDirectory(OUTPUT_DIR)
 plot_opts.SetPlotFrameRef(False)
-plot_opts.SetExcludeEdgeLayer(True)
+# SetExcludeEdgeLayer removed in KiCad 9 — Edge.Cuts exported as its own layer
 plot_opts.SetUseGerberX2format(False)          # classic X1 — JLCPCB compatible
 plot_opts.SetIncludeGerberNetlistInfo(False)
 plot_opts.SetUseAuxOrigin(False)
