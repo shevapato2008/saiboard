@@ -200,3 +200,8 @@ sdkconfig*
 
 # Gemini
 .gemini-clipboard
+
+# modified kicad files
+electronics/kicad_files/3x8_filled
+electronics/kicad_files/8x3_filled
+electronics/kicad_files/8x8_filled

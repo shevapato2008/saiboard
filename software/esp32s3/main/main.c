@@ -32,7 +32,7 @@ static const char *TAG = "TCP/IP socket server";
 static adc_oneshot_unit_handle_t adc1_handle;
 static led_strip_t strip = {
     .type = LED_STRIP_SK6812,
-    .length = 64, // CHANGED: 8x8 = 64
+    .length = 30, // SK6812 strip, 30 LEDs
     .gpio = LED_PIN_AT_5,
     .buf = NULL,
     .is_rgbw = true,
